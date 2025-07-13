@@ -123,3 +123,29 @@
 .preview-btn:hover {
   background: #357ec7;
 }
+.sidebar-menu .sidebar-link {
+  display: block;
+  padding: 0.8rem 1rem;
+  color: black;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1.3rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.sidebar-menu .sidebar-link:hover {
+  background-color: #eaeaea;
+}
+
+.sidebar-menu .sidebar-link.active {
+  background-color: #fbedbd;
+  font-weight: bold;
+}
+
+.sidebar-menu .sidebar-link.active:hover {
+  background-color: #fbedbd;
+}
