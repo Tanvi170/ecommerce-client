@@ -18,10 +18,10 @@ export default function Stores() {
   const [businessType, setBusinessType] = useState("Retail");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [bannerImage, setBannerImage] = useState(null);
-const [bannerPreview, setBannerPreview] = useState(null);
-const [storeAddress, setStoreAddress] = useState("");
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const [storeAddress, setStoreAddress] = useState("");
 
-
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     setSlug(storeName.trim().toLowerCase().replace(/\s+/g, "-"));
@@ -43,57 +43,51 @@ const [storeAddress, setStoreAddress] = useState("");
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const storedEmail = localStorage.getItem("userEmail");
-  console.log("Stored email from localStorage:", storedEmail);
-if (!storedEmail) {
-  alert("User email not found. Please log in again.");
-  return;
-}
-setEmail(storedEmail);
-
-
-  const formData = new FormData();
-  formData.append('store_name', storeName);
-  formData.append('slug', slug);
-  formData.append('description', description);
-  formData.append('store_email', storedEmail); 
-  formData.append('store_address', storeAddress);
-  formData.append('password', password);
-  formData.append('facebook', facebook);
-  formData.append('instagram', instagram);
-  formData.append('theme', theme);
-  formData.append('primary_color', primaryColor);
-  formData.append('currency', currency);
-  formData.append('timezone', timezone);
-  formData.append('business_type', businessType);
-
-  if (logo) formData.append('logo', logo);
-  if (bannerImage) formData.append('banner_image', bannerImage);
-
-
-  try {
-    const res = await fetch('http://localhost:5000/api/stores_backup', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      alert("🎉 Store has been successfully created!");
-      // reset form fields...
-    } else {
-      console.error(result);
-      alert("❌ Failed to create store.");
+    const storedEmail = localStorage.getItem("userEmail");
+    if (!storedEmail) {
+      alert("User email not found. Please log in again.");
+      return;
     }
-  } catch (err) {
-    console.error("Error submitting form:", err);
-    alert("An error occurred. Check console for details.");
-  }
-};
+    setEmail(storedEmail);
 
+    const formData = new FormData();
+    formData.append('store_name', storeName);
+    formData.append('slug', slug);
+    formData.append('description', description);
+    formData.append('store_email', storedEmail);
+    formData.append('store_address', storeAddress);
+    formData.append('password', password);
+    formData.append('facebook', facebook);
+    formData.append('instagram', instagram);
+    formData.append('theme', theme);
+    formData.append('primary_color', primaryColor);
+    formData.append('currency', currency);
+    formData.append('timezone', timezone);
+    formData.append('business_type', businessType);
+    if (logo) formData.append('logo', logo);
+    if (bannerImage) formData.append('banner_image', bannerImage);
+
+    try {
+      const res = await fetch(`${API}/api/stores_backup`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("🎉 Store has been successfully created!");
+      } else {
+        console.error(result);
+        alert("❌ Failed to create store.");
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("An error occurred. Check console for details.");
+    }
+  };
 
   function shadeColor(color, percent) {
     let R = parseInt(color.substring(1, 3), 16);
@@ -177,38 +171,22 @@ setEmail(storedEmail);
             {logoPreview && <img src={logoPreview} alt="Logo" className="mt-2 h-20 rounded shadow-md" />}
           </div>
           <div className="md:col-span-2">
-  <label className="block font-medium mb-1">Store Address</label>
-  <input
-    type="text"
-    value={storeAddress}
-    onChange={(e) => setStoreAddress(e.target.value)}
-    className="w-full p-2 border rounded"
-    placeholder="Enter your store's physical address"
-  />
-
-  <label className="block font-medium mb-1">Banner Image</label>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      setBannerImage(file);
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => setBannerPreview(reader.result);
-        reader.readAsDataURL(file);
-      }
-    }}
-    className="w-full p-2 border rounded bg-white"
-  />
-  {bannerPreview && (
-    <img
-      src={bannerPreview}
-      alt="Banner"
-      className="mt-2 h-24 w-full object-cover rounded shadow"
-    />
-  )}
-</div>
+            <label className="block font-medium mb-1">Store Address</label>
+            <input type="text" value={storeAddress} onChange={(e) => setStoreAddress(e.target.value)} className="w-full p-2 border rounded" placeholder="Enter your store's physical address" />
+            <label className="block font-medium mb-1 mt-4">Banner Image</label>
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files[0];
+              setBannerImage(file);
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => setBannerPreview(reader.result);
+                reader.readAsDataURL(file);
+              }
+            }} className="w-full p-2 border rounded bg-white" />
+            {bannerPreview && (
+              <img src={bannerPreview} alt="Banner" className="mt-2 h-24 w-full object-cover rounded shadow" />
+            )}
+          </div>
           <div>
             <label className="block font-medium mb-1">Theme</label>
             <select value={theme} onChange={(e) => setTheme(e.target.value)} className="w-full p-2 border rounded">
@@ -239,13 +217,7 @@ setEmail(storedEmail);
               background: `linear-gradient(to right, ${primaryColor}, ${shadeColor(primaryColor, -20)})`
             }}></div>
           </div>
-          
-
         </div>
-        <div>
-  
-</div>
-
 
         <button type="submit" className="submit-btn mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
           ✅ Save Store Setup

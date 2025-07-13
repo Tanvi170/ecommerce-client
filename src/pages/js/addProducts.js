@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../css/addProducts.css';
-import AdminOverview from './admin-overview';
 
 const AddProduct = () => {
   const navigate = useNavigate();
-
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -17,15 +15,17 @@ const AddProduct = () => {
     image: null,
   });
 
+  const API = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('authToken');
+
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
     axios
-      .get('http://localhost:5000/api/products/categories', {
+      .get(`${API}/api/products/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCategories(res.data))
       .catch((err) => console.error('Failed to fetch categories:', err));
-  }, []);
+  }, [API, token]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +38,6 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('authToken');
     const data = new FormData();
 
     data.append('product_name', formData.name);
@@ -49,35 +48,32 @@ const AddProduct = () => {
     if (formData.image) data.append('image', formData.image);
 
     try {
-      await axios.post('http://localhost:5000/api/products/add', data, {
+      await axios.post(`${API}/api/products/add`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
       navigate('/AdminOverview', { state: { tab: 'Products' } });
-// 🔁 Back to Products Page
     } catch (error) {
       console.error('Product creation failed:', error);
+      alert('Failed to add product');
     }
   };
 
   return (
     <div className="add-product-wrapper">
       <div className="add-product-card">
-        {/* Header with Back + Buttons */}
         <div className="form-header">
           <button className="back-btn" onClick={() => navigate('/AdminOverview', { state: { tab: 'Products' } })}>←</button>
           <h2 className="heading-title">Products</h2>
           <div className="form-actions">
-         <button className="cancel-btn" onClick={() => navigate('/AdminOverview', { state: { tab: 'Products' } })}>Cancel</button>
-         <button className="save-btn" onClick={handleSubmit}>Save</button>
-  </div>
-</div>
-
+            <button className="cancel-btn" onClick={() => navigate('/AdminOverview', { state: { tab: 'Products' } })}>Cancel</button>
+            <button className="save-btn" onClick={handleSubmit}>Save</button>
+          </div>
+        </div>
 
         <div className="add-product-content">
-          {/* Left Panel: Image */}
           <div className="left-panel">
             <h2>Add new product</h2>
             <div className="image-upload">
@@ -95,7 +91,6 @@ const AddProduct = () => {
             </label>
           </div>
 
-          {/* Right Panel: Form */}
           <div className="right-panel">
             <form>
               <label>Product Name</label>
@@ -106,14 +101,11 @@ const AddProduct = () => {
 
               <label>Product Category</label>
               <select name="category" value={formData.category} onChange={handleInputChange} required>
-  <option value="">Select category</option>
-  {categories.map((cat) => (
-    <option key={cat.name} value={cat.name}>
-      {cat.name}
-    </option>
-  ))}
-</select>
-
+                <option value="">Select category</option>
+                {categories.map((cat) => (
+                  <option key={cat.name} value={cat.name}>{cat.name}</option>
+                ))}
+              </select>
 
               <label>Product Description</label>
               <textarea name="description" rows="4" value={formData.description} onChange={handleInputChange} />

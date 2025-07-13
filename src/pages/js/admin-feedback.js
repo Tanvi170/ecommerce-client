@@ -9,11 +9,13 @@ const Feedback = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const response = await axios.get('http://localhost:5000/api/feedback', {
+        const response = await axios.get(`${API}/api/feedback`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFeedbacks(response.data);
@@ -25,7 +27,7 @@ const Feedback = () => {
     };
 
     fetchFeedback();
-  }, []);
+  }, [API]);
 
   const filteredFeedbacks = feedbacks.filter(fb => {
     const search = searchTerm.toLowerCase();

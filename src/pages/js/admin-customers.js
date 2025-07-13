@@ -1,4 +1,3 @@
-// admin-customers.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +10,13 @@ const Customers = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const API = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('authToken');
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        const response = await axios.get('http://localhost:5000/api/customers', {
+        const response = await axios.get(`${API}/api/customers`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCustomers(response.data);
@@ -27,7 +28,7 @@ const Customers = () => {
     };
 
     fetchCustomers();
-  }, []);
+  }, [API, token]);
 
   const filteredCustomers = customers.filter((customer) => {
     const search = searchTerm.toLowerCase();
@@ -43,7 +44,7 @@ const Customers = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-NG', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,

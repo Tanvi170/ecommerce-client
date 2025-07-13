@@ -9,6 +9,8 @@ const CustomerProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // ✅ fallback for local dev
+
   useEffect(() => {
     const token = localStorage.getItem('customerToken');
 
@@ -20,7 +22,7 @@ const CustomerProfile = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/customer/profile', {
+        const response = await axios.get(`${API}/api/customer/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCustomer(response.data.customer);
@@ -33,7 +35,7 @@ const CustomerProfile = () => {
     };
 
     fetchProfile();
-  }, [storeId, navigate]);
+  }, [storeId, navigate, API]);
 
   const handleLogout = () => {
     localStorage.removeItem('customerToken');

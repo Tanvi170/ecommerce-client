@@ -11,6 +11,8 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -23,7 +25,7 @@ const Orders = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/orders', {
+        const response = await axios.get(`${API}/api/orders`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { storeId }
         });
@@ -37,7 +39,7 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [API]);
 
   const filteredOrders = orders.filter(order => {
     const search = searchTerm.toLowerCase();
@@ -73,8 +75,8 @@ const Orders = () => {
       }
 
       await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/status`,
-        { status: newStatus, storeId }, // ✅ send storeId in body
+        `${API}/api/orders/${orderId}/status`,
+        { status: newStatus, storeId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

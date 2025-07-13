@@ -11,6 +11,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -23,7 +25,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${API}/api/auth/login`, {
         email,
         password,
         rememberMe
@@ -31,11 +33,10 @@ const Login = () => {
 
       const { token, user } = response.data;
 
-      // ✅ Store everything needed
       localStorage.setItem('authToken', token);
-      localStorage.setItem('storeId', user.storeId);      // ✅ required for store filtering
-      localStorage.setItem('userType', user.userType);    // optional
-      localStorage.setItem('userEmail', user.email);      // optional
+      localStorage.setItem('storeId', user.storeId);
+      localStorage.setItem('userType', user.userType);
+      localStorage.setItem('userEmail', user.email);
 
       alert('Login successful!');
       navigate('/AdminOverview');

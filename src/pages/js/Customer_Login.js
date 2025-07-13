@@ -3,65 +3,64 @@ import { useNavigate, useParams } from 'react-router-dom';
 import '../css/Customer_Login.css';
 import cus_login_img from '../../images/cus_login.jpg';
 import axios from 'axios';
-import { useCart } from '../js/CartContext'; // ✅ Import useCart
+import { useCart } from '../js/CartContext';
 
 function Customer_Login() {
   const [cusEmail, setCusEmail] = useState('');
   const [cusPassword, setCusPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
   const { storeId } = useParams();
-  const { addToCart } = useCart(); // ✅ Access addToCart from context
+  const { addToCart } = useCart();
 
- const [isLoading, setIsLoading] = useState(false);
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!cusEmail || !cusPassword || !cusEmail.includes('@')) {
-    setError('Please enter a valid email and password.');
-    return;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!cusEmail || !cusPassword || !cusEmail.includes('@')) {
+      setError('Please enter a valid email and password.');
+      return;
+    }
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const res = await axios.post('http://localhost:5000/api/customer/auth/login', {
-      email: cusEmail,
-      password: cusPassword,
-      store_id: storeId,
-    });
+    try {
+      const res = await axios.post(`${API}/api/customer/auth/login`, {
+        email: cusEmail,
+        password: cusPassword,
+        store_id: storeId,
+      });
 
-    // ✅ Store token & IDs
-    localStorage.setItem('customerToken', res.data.token);
-    localStorage.setItem('customerId', res.data.user.id);
-    localStorage.setItem('storeId', res.data.user.storeId);
+      localStorage.setItem('customerToken', res.data.token);
+      localStorage.setItem('customerId', res.data.user.id);
+      localStorage.setItem('storeId', res.data.user.storeId);
 
-    // ✅ Handle redirect + cart restoration
-    const redirectPath = localStorage.getItem('redirectAfterLogin');
-    const pendingItem = localStorage.getItem('pendingCartItem');
+      // Restore pending cart item if present
+      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      const pendingItem = localStorage.getItem('pendingCartItem');
 
-    if (pendingItem) {
-  try {
-    const parsedItem = JSON.parse(pendingItem);
-    addToCart(parsedItem);
-  } catch (e) {
-    console.warn('⚠️ Failed to restore pending cart item:', e);
-  } finally {
-    localStorage.removeItem('pendingCartItem');
-  }
-}
+      if (pendingItem) {
+        try {
+          const parsedItem = JSON.parse(pendingItem);
+          addToCart(parsedItem);
+        } catch (e) {
+          console.warn('⚠️ Failed to restore pending cart item:', e);
+        } finally {
+          localStorage.removeItem('pendingCartItem');
+        }
+      }
 
-
-
-    localStorage.removeItem('redirectAfterLogin');
-
-    navigate(redirectPath || `/store/${storeId}/template`);
-  } catch (err) {
-    console.error(err);
-    setError(err.response?.data?.message || 'Login failed.');
-  }
-};
-
+      localStorage.removeItem('redirectAfterLogin');
+      navigate(redirectPath || `/store/${storeId}/template`);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Login failed.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="login-wrapper">
@@ -93,9 +92,8 @@ const handleSubmit = async (e) => {
               {error && <p className="error-msg">{error}</p>}
 
               <button type="submit" disabled={isLoading}>
-  {isLoading ? 'Logging in...' : 'Login'}
-</button>
-
+                {isLoading ? 'Logging in...' : 'Login'}
+              </button>
             </form>
 
             <p className="signup-text">

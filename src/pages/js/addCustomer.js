@@ -22,12 +22,13 @@ const AddCustomer = () => {
 
     try {
       const token = localStorage.getItem('authToken');
+      const API = process.env.REACT_APP_API_URL;
 
-      const response = await fetch('http://localhost:5000/api/customers/add', {
+      const response = await fetch(`${API}/api/customers/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` // ✅ FIXED: Added template literal syntax
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(customer)
       });

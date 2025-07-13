@@ -26,6 +26,7 @@ const Overview = () => {
 
   const storeId = localStorage.getItem('storeId');
   const token = localStorage.getItem('authToken');
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // ✅ use Render URL if set
 
   useEffect(() => {
     const fetchOverview = async () => {
@@ -35,7 +36,7 @@ const Overview = () => {
       }
 
       try {
-        const res = await axios.get(`http://localhost:5000/api/overview/${storeId}`);
+        const res = await axios.get(`${API}/api/overview/${storeId}`);
         const fetchedData = res.data;
 
         const formattedRevenue = fetchedData.dailyRevenue
@@ -64,7 +65,7 @@ const Overview = () => {
       }
 
       try {
-        const res = await axios.get(`http://localhost:5000/api/stores_backup/${storeId}`, {
+        const res = await axios.get(`${API}/api/stores_backup/${storeId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStore(res.data);
@@ -75,7 +76,7 @@ const Overview = () => {
 
     fetchOverview();
     fetchStore();
-  }, [storeId, token]);
+  }, [storeId, token, API]);
 
   return (
     <>

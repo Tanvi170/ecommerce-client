@@ -11,7 +11,6 @@ import {
   Filler,
 } from 'chart.js';
 import '../css/statistics.css'; 
-//npm install react-chartjs-2 chart.js
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
@@ -25,6 +24,7 @@ const Statistics = () => {
 
   const dayLabels = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const storeId = localStorage.getItem('storeId');
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // ✅ Supports Render
 
   useEffect(() => {
     if (!storeId) return;
@@ -32,8 +32,8 @@ const Statistics = () => {
     const fetchStats = async () => {
       try {
         const [totalRes, dateRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/statistics', { params: { storeId } }),
-          axios.get('http://localhost:5000/api/statistics/by-date', { params: { storeId } }),
+          axios.get(`${API}/api/statistics`, { params: { storeId } }),
+          axios.get(`${API}/api/statistics/by-date`, { params: { storeId } }),
         ]);
 
         setTotalSales(totalRes.data.total_sales || 0);
@@ -62,7 +62,7 @@ const Statistics = () => {
     };
 
     fetchStats();
-  }, [storeId]);
+  }, [storeId, API]);
 
   const chartData = (data, color) => ({
     labels: dayLabels,
@@ -124,7 +124,7 @@ const Statistics = () => {
 
       {showRawData && rawData && (
         <div className="raw-data-section">
-          <h4>Sales by Date </h4>
+          <h4>Sales by Date</h4>
           <pre>{JSON.stringify(rawData, null, 2)}</pre>
         </div>
       )}

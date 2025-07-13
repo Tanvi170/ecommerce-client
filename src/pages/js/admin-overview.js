@@ -21,11 +21,12 @@ const menuItems = [
 ];
 
 const AdminOverview = () => {
-  const initialTab = localStorage.getItem('redirectToOrders') === 'true' ? 'Orders' : 'Overview';
-  const [activeTab, setActiveTab] = useState(initialTab);
   const navigate = useNavigate();
+  const initialTab =
+    localStorage.getItem('redirectToOrders') === 'true' ? 'Orders' : 'Overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
-  // Clear redirect flag after using it
+  // Clear redirect flag on load
   useEffect(() => {
     if (localStorage.getItem('redirectToOrders') === 'true') {
       localStorage.removeItem('redirectToOrders');
@@ -35,6 +36,7 @@ const AdminOverview = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('storeId');
+    localStorage.removeItem('authToken');
     navigate('/');
   };
 
@@ -45,14 +47,13 @@ const AdminOverview = () => {
         <h2 className="sidebar-title">DUKAANIFY</h2>
         <nav className="sidebar-menu">
           {menuItems.map(item => (
-            <a
+            <button
               key={item}
-              href="#"
               className={`sidebar-link ${activeTab === item ? 'active' : ''}`}
               onClick={() => setActiveTab(item)}
             >
               {item}
-            </a>
+            </button>
           ))}
           <button className="logout-btn" onClick={handleLogout}>
             Logout
@@ -62,13 +63,13 @@ const AdminOverview = () => {
 
       {/* Main Content */}
       <main className="admin-main">
-        {activeTab === 'Overview' && <Overview/>}
+        {activeTab === 'Overview' && <Overview />}
         {activeTab === 'Statistics' && <SalesDashboard />}
         {activeTab === 'Customers' && <AdminCustomers />}
         {activeTab === 'Products' && <AdminProducts />}
         {activeTab === 'Orders' && <AdminOrders />}
-        {activeTab === 'Feedback' && <AdminFeedback/>}
-        {activeTab === 'Store' && <Stores/>}
+        {activeTab === 'Feedback' && <AdminFeedback />}
+        {activeTab === 'Store' && <Stores />}
       </main>
     </div>
   );

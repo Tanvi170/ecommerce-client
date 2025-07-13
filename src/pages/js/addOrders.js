@@ -16,13 +16,14 @@ const AddOrder = () => {
 
   const storeId = localStorage.getItem('storeId');
   const token = localStorage.getItem('token');
+  const API = process.env.REACT_APP_API_URL; // ✅ Use from .env
 
   useEffect(() => {
     if (!storeId) return alert('Store ID missing');
 
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/orders/customers_orders', {
+        const res = await axios.get(`${API}/api/orders/customers_orders`, {
           params: { storeId }
         });
         setCustomers(res.data);
@@ -33,7 +34,7 @@ const AddOrder = () => {
 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/orders/products', {
+        const res = await axios.get(`${API}/api/orders/products`, {
           params: { storeId }
         });
         setProducts(res.data);
@@ -44,9 +45,8 @@ const AddOrder = () => {
 
     fetchCustomers();
     fetchProducts();
-  }, [storeId]);
+  }, [storeId, API]);
 
-  // ✅ Auto-set price from products list when a product is selected
   useEffect(() => {
     const product = products.find(p => p.product_id === Number(selectedProductId));
     if (product) {
@@ -97,14 +97,14 @@ const AddOrder = () => {
     };
 
     try {
-      const res = await axios.post('http://localhost:5000/api/orders', payload, {
+      const res = await axios.post(`${API}/api/orders`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const orderId = res.data.orderId;
 
       if (status === 'Delivered') {
-        await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, {
+        await axios.put(`${API}/api/orders/${orderId}/status`, {
           status: 'Delivered',
           storeId: Number(storeId)
         });
@@ -183,9 +183,8 @@ const AddOrder = () => {
             <button type="submit" className="add-order-btn">Submit Order</button>
 
             <button type="button" className="add-order-btn cancel-btn" onClick={() => navigate(-1)}>
-            Cancel
+              Cancel
             </button>
-
           </form>
         </div>
       </div>

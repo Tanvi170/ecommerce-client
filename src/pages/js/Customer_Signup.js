@@ -13,32 +13,31 @@ function Customer_Signup() {
   const [cusConfirmPassword, setCusConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { storeId } = useParams(); // ✅ Get storeId from URL
+  const { storeId } = useParams();
+
+  // ✅ Use API base URL from environment variable
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Client-side validation
+    // Validation
     if (!cusName || !cusEmail || !cusPhone || !cusAddress || !cusPassword || !cusConfirmPassword) {
       setError('All fields are required.');
       return;
     }
-
     if (!cusEmail.includes('@')) {
       setError('Enter a valid email.');
       return;
     }
-
     if (!/^\d{10}$/.test(cusPhone)) {
       setError('Phone number must be exactly 10 digits.');
       return;
     }
-
     if (cusPassword.length < 6) {
       setError('Password must be at least 6 characters.');
       return;
     }
-
     if (cusPassword !== cusConfirmPassword) {
       setError('Passwords do not match.');
       return;
@@ -47,17 +46,17 @@ function Customer_Signup() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/customer/auth/signup', {
+      const res = await axios.post(`${API}/api/customer/auth/signup`, {
         customer_name: cusName,
         email: cusEmail,
         password: cusPassword,
         phone_number: cusPhone,
         address: cusAddress,
-        store_id: storeId // ✅ storeId from route
+        store_id: storeId
       });
 
       alert('Signup successful! Please login.');
-      navigate(`/store/${storeId}/login`); // ✅ back to login for that store
+      navigate(`/store/${storeId}/login`);
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || 'Signup failed.');

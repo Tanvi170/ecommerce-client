@@ -10,12 +10,13 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const API = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/orders', {
+        const response = await axios.get(`${API}/api/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(response.data);
@@ -27,7 +28,7 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [API]);
 
   const filteredOrders = orders.filter(order => {
     const search = searchTerm.toLowerCase();
@@ -46,7 +47,7 @@ const Orders = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-NG', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
@@ -57,7 +58,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/status`,
+        `${API}/api/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -73,7 +74,7 @@ const Orders = () => {
   };
 
   const handleAddNewOrder = () => {
-    navigate('/addorder'); // ✅ Corrected route
+    navigate('/addorder');
   };
 
   if (loading) return <div className="loading">Loading orders...</div>;
